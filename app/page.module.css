@@ -79,6 +79,16 @@
   cursor: not-allowed;
 }
 
+.button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 7px 0 #000;
+}
+
+.button:active {
+  transform: translateY(2px);
+  box-shadow: 0 3px 0 #000;
+}
+
 .fantasiasList {
   display: flex;
   flex-direction: column;
@@ -95,6 +105,7 @@
   font-size: 16px;
   line-height: 1.5;
   box-shadow: 0 0 20px rgba(0, 255, 0, 0.2);
+  animation: slideIn 0.5s ease-out;
 }
 
 .emptyState {
@@ -134,5 +145,16 @@
   }
   80% {
     transform: translate(2px, -2px);
+  }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
   }
 }
