@@ -17,7 +17,7 @@ export default function RootLayout({
     <html lang="pt-BR">
       <head>
         <link href="https://fonts.googleapis.com/css2?family=Creepster&display=swap" rel="stylesheet" />
-        <link type="image/jpg" rel='icon' href='piranha.jpg' />
+        <link type="image/x-icon" rel='shortcut icon' href='plant.gif' />
         
       </head>
       <body className={inter.className}>{children}</body>

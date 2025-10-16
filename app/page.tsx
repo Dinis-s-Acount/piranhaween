@@ -33,7 +33,7 @@ export default function Home() {
 
   const adicionarFantasia = async () => {
     if (input.trim().length === 0) {
-      setError("Por favor, digite uma fantasia!");
+      setError("💀Digite logo uma fantasia!💀"); 
       return;
     }
 
@@ -78,7 +78,9 @@ export default function Home() {
 
   return (
     <div className={styles.container}>
-      <h1 className={styles.title}>PIRANHAWEEN</h1>
+      <h1 className={styles.title}>
+        <img src="title.png" alt="Piranhaween" />
+      </h1>
 
       <div className={styles.inputSection}>
         <textarea
