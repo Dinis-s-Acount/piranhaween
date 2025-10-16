@@ -110,7 +110,10 @@ export default function Home() {
       <div className={styles.fantasiasList}>
         {fantasias.length === 0 ? (
           <div className={styles.emptyState}>
-            Nenhuma fantasia ainda... Seja o primeiro!
+            <img src="plant.gif" alt="Plant" height="48px"/>
+            <img src="plant.gif" alt="Plant" height="48px"/>
+            <img src="plant.gif" alt="Plant" height="48px"/>
+            <img src="plant.gif" alt="Plant" height="48px"/>
           </div>
         ) : (
           fantasias.map((fantasia) => (
