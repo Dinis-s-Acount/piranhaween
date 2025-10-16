@@ -1,95 +1,125 @@
-import Image from 'next/image'
-import styles from './page.module.css'
+"use client";
+
+import { useState, useEffect } from "react";
+import styles from "./page.module.css";
+
+interface Fantasia {
+  id: number;
+  conteudo: string;
+  criado_em: string;
+}
 
 export default function Home() {
+  const [fantasias, setFantasias] = useState<Fantasia[]>([]);
+  const [input, setInput] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    carregarFantasias();
+  }, []);
+
+  const carregarFantasias = async () => {
+    try {
+      const res = await fetch("/api/fantasias");
+      if (res.ok) {
+        const data = await res.json();
+        setFantasias(data);
+      }
+    } catch (err) {
+      console.error("Erro ao carregar fantasias:", err);
+    }
+  };
+
+  const adicionarFantasia = async () => {
+    if (input.trim().length === 0) {
+      setError("Por favor, digite uma fantasia!");
+      return;
+    }
+
+    if (input.length > 400) {
+      setError("Máximo de 400 caracteres!");
+      return;
+    }
+
+    setLoading(true);
+    setError("");
+
+    try {
+      const res = await fetch("/api/fantasias", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ conteudo: input }),
+      });
+
+      if (res.ok) {
+        const novaFantasia = await res.json();
+        setFantasias([novaFantasia, ...fantasias]);
+        setInput("");
+      } else {
+        const data = await res.json();
+        setError(data.error || "Erro ao adicionar fantasia");
+      }
+    } catch (err) {
+      setError("Erro ao conectar com o servidor");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      adicionarFantasia();
+    }
+  };
+
   return (
-    <main className={styles.main}>
-      <div className={styles.description}>
-        <p>
-          Get started by editing&nbsp;
-          <code className={styles.code}>app/page.tsx</code>
-        </p>
-        <div>
-          <a
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{' '}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className={styles.vercelLogo}
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
-        </div>
-      </div>
+    <div className={styles.container}>
+      <h1 className={styles.title}>PIRANHAWEEN</h1>
 
-      <div className={styles.center}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
+      <div className={styles.inputSection}>
+        <textarea
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          onKeyDown={handleKeyDown}
+          placeholder="Digite sua fantasia aqui..."
+          maxLength={400}
+          disabled={loading}
+          className={styles.textarea}
         />
+        <div
+          className={`${styles.charCount} ${
+            input.length > 350 ? styles.warning : ""
+          }`}
+        >
+          {input.length} / 400
+        </div>
+        {error && <div className={styles.error}>{error}</div>}
+        <button
+          onClick={adicionarFantasia}
+          disabled={loading}
+          className={styles.button}
+        >
+          {loading ? "ENVIANDO..." : "ADICIONAR FANTASIA"}
+        </button>
       </div>
 
-      <div className={styles.grid}>
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Docs <span>-&gt;</span>
-          </h2>
-          <p>Find in-depth information about Next.js features and API.</p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Learn <span>-&gt;</span>
-          </h2>
-          <p>Learn about Next.js in an interactive course with&nbsp;quizzes!</p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Templates <span>-&gt;</span>
-          </h2>
-          <p>Explore the Next.js 13 playground.</p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Deploy <span>-&gt;</span>
-          </h2>
-          <p>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
+      <div className={styles.fantasiasList}>
+        {fantasias.length === 0 ? (
+          <div className={styles.emptyState}>
+            Nenhuma fantasia ainda... Seja o primeiro!
+          </div>
+        ) : (
+          fantasias.map((fantasia) => (
+            <div key={fantasia.id} className={styles.fantasiaItem}>
+              {fantasia.conteudo}
+            </div>
+          ))
+        )}
       </div>
-    </main>
-  )
+    </div>
+  );
 }
